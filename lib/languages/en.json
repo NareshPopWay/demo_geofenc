@@ -1,0 +1,11 @@
+{
+  "appTitle_text" : "Home Screen",
+  "btn_text" : "Press here",
+  "loader_text" : "Please Wait",
+  "title1_text" : "Location match",
+  "title2_text" : "Location not match",
+  "action_text" : "Change Language",
+  "content1_text" : "Your location is match",
+  "content2_text" : "Your location is not match",
+  "dialogBtn_text" : "OK"
+}
