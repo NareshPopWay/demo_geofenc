@@ -4,43 +4,33 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 class DemoLocalization {
-
   DemoLocalization(this.locale);
 
   final Locale locale;
 
   static DemoLocalization? of(BuildContext context) {
-
     return Localizations.of<DemoLocalization>(context, DemoLocalization);
-
   }
 
   Map<String, String>? _localizedValues;
 
   Future<void> load() async {
-
-    String jsonStringValues =
-
-    await rootBundle.loadString('lib/languages/${locale.languageCode}.json');
+    String jsonStringValues = await rootBundle
+        .loadString('lib/languages/${locale.languageCode}.json');
 
     Map<String, dynamic> mappedJson = json.decode(jsonStringValues);
 
-    _localizedValues = mappedJson.map((key, value) => MapEntry(key, value.toString()));
-
+    _localizedValues =
+        mappedJson.map((key, value) => MapEntry(key, value.toString()));
   }
 
   String? translate(String key) {
-
     return _localizedValues![key];
-
   }
 
   static const LocalizationsDelegate<DemoLocalization> delegate =
-
-  _DemoLocalizationsDelegate();
+      _DemoLocalizationsDelegate();
 }
-
-
 
 class _DemoLocalizationsDelegate
     extends LocalizationsDelegate<DemoLocalization> {
@@ -50,12 +40,12 @@ class _DemoLocalizationsDelegate
   bool isSupported(Locale locale) {
     // All supported languages
 
-    return ['en','gu','hi','mr'].contains(locale.languageCode);
+    return ['en', 'gu', 'hi', 'mr'].contains(locale.languageCode);
   }
 
   @override
   Future<DemoLocalization> load(Locale locale) async {
-    DemoLocalization localization =  DemoLocalization(locale);
+    DemoLocalization localization = DemoLocalization(locale);
 
     // The [load] method from DemoLocalization class runs here
 
@@ -71,5 +61,3 @@ class _DemoLocalizationsDelegate
 
   bool shouldReload(LocalizationsDelegate<DemoLocalization> old) => false;
 }
-
-

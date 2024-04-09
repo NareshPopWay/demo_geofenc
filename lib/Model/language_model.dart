@@ -1,5 +1,4 @@
 class Language {
-
   final int id;
 
   final String flag;
@@ -8,8 +7,11 @@ class Language {
 
   final String languageCode;
 
-  Language({required this.id, required this.flag, required this.name, required this.languageCode});
-
+  Language(
+      {required this.id,
+      required this.flag,
+      required this.name,
+      required this.languageCode});
 
   // static List<Language> languageList() {
   //
@@ -24,5 +26,4 @@ class Language {
   //   ];
   //
   // }
-
 }
