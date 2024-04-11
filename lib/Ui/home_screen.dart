@@ -1,12 +1,13 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:demo_geofenc/Controller/home_controller.dart';
-import 'package:demo_geofenc/change_lanuage.dart';
-import 'package:demo_geofenc/Model/lat_long_model.dart';
-import 'package:demo_geofenc/localization/language_constant.dart';
+import 'package:demo_geofenc/Ui/calander/week_view.dart';
+import 'package:demo_geofenc/common/localization/language_constant.dart';
+import 'package:demo_geofenc/ui/change_lanuage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:simple_speed_dial/simple_speed_dial.dart';
 
 class HomeScreen extends GetView<HomeController> {
   HomeScreen({super.key});
@@ -56,6 +57,47 @@ class HomeScreen extends GetView<HomeController> {
               ),
             ],
           ),
+      floatingActionButton: SpeedDial(
+        child: const Icon(Icons.add),
+        closedForegroundColor: Colors.white,
+        closedBackgroundColor: Colors.blueGrey,
+        openForegroundColor: Colors.blueGrey,
+        openBackgroundColor: Colors.white,
+        // labelsStyle: /* Your label TextStyle goes here */,
+        labelsBackgroundColor: Colors.white,
+        // controller: /* Your custom animation controller goes here */,
+        speedDialChildren: <SpeedDialChild>[
+          SpeedDialChild(
+            child: const Icon(Icons.calendar_month_outlined),
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blueGrey,
+            label: 'Monthly Calendar',
+            onPressed: () {
+               // Get.back();
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.calendar_view_week),
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blueGrey,
+            label: 'Weekly Calendar',
+            onPressed: () {
+              Get.to(() => WeekViewScreen());
+
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.calendar_view_day),
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blueGrey,
+            label: 'Daily Calendar ',
+            onPressed: () {
+
+            },
+          ),
+          //  Your other SpeedDialChildren go here.
+        ],
+      ),
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,

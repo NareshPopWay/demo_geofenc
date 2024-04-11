@@ -1,10 +1,6 @@
 // ignore_for_file: must_be_immutable, unrelated_type_equality_checks
 
 import 'package:demo_geofenc/Controller/change_language_controller.dart';
-import 'package:demo_geofenc/Controller/home_controller.dart';
-import 'package:demo_geofenc/Model/language_model.dart';
-import 'package:demo_geofenc/Model/lat_long_model.dart';
-import 'package:demo_geofenc/localization/language_constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

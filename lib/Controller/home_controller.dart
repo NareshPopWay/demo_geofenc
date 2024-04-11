@@ -1,6 +1,6 @@
 import 'dart:math' show atan2, cos, pi, pow, sin, sqrt;
 import 'package:demo_geofenc/Model/lat_long_model.dart';
-import 'package:demo_geofenc/localization/language_constant.dart';
+import 'package:demo_geofenc/common/localization/language_constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
