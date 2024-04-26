@@ -44,10 +44,8 @@ class ChangeLanguageScreen extends GetView<ChangeLanguageController> {
                       itemBuilder: (context, index) => Obx(() =>
                           GestureDetector(
                             onTap: () {
-                              controller.selected.value =
-                                  controller.languageList[index].languageCode;
-                              controller.languageCode.value =
-                                  controller.languageList[index].languageCode;
+                              controller.selected.value = controller.languageList[index].languageCode;
+                              controller.languageCode.value = controller.languageList[index].languageCode;
                             },
                             child: Container(
                                 decoration: BoxDecoration(

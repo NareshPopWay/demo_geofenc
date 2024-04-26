@@ -17,8 +17,7 @@ class ChangeLanguageController extends GetxController {
 
   RxList<Language> languageList = <Language>[
     Language(id: 0, flag: "🇺🇸", name: "English", languageCode: "en"),
-    Language(
-        id: 1, flag: "🇮🇳", name: "ગુજરાતી\n Gujrati", languageCode: "gu"),
+    Language(id: 1, flag: "🇮🇳", name: "ગુજરાતી\n Gujrati", languageCode: "gu"),
     Language(id: 2, flag: "🇮🇳", name: "हिंदी\n Hindi", languageCode: "hi"),
     Language(id: 3, flag: "🇮🇳", name: "मराठी\n Marathi", languageCode: "mr"),
   ].obs;
