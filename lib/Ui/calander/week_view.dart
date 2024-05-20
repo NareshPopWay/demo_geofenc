@@ -57,7 +57,7 @@ class WeekViewScreen extends GetView<WeekViewController> {
       //   ],
       // ),
       body: SfCalendar(
-        view: CalendarView.month,
+        view: CalendarView.timelineWeek,
         dataSource: MeetingDataSource(_getDataSource()),
         monthViewSettings: MonthViewSettings(
             appointmentDisplayMode: MonthAppointmentDisplayMode.appointment),

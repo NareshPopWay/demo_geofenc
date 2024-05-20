@@ -2,6 +2,7 @@
 
 import 'package:demo_geofenc/Controller/home_controller.dart';
 import 'package:demo_geofenc/Ui/calander/week_view.dart';
+import 'package:demo_geofenc/Ui/qr_scanner.dart';
 import 'package:demo_geofenc/common/localization/language_constant.dart';
 import 'package:demo_geofenc/ui/change_lanuage.dart';
 import 'package:flutter/cupertino.dart';
@@ -68,12 +69,13 @@ class HomeScreen extends GetView<HomeController> {
         // controller: /* Your custom animation controller goes here */,
         speedDialChildren: <SpeedDialChild>[
           SpeedDialChild(
-            child: const Icon(Icons.calendar_month_outlined),
+            child: const Icon(Icons.qr_code_scanner_outlined),
             foregroundColor: Colors.white,
             backgroundColor: Colors.blueGrey,
-            label: 'Monthly Calendar',
+            label: 'Qr Scanner',
             onPressed: () {
                // Get.back();
+              Get.to(() => ScannerScreen());
             },
           ),
           SpeedDialChild(

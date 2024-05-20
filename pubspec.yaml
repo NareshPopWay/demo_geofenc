@@ -35,6 +35,8 @@ dependencies:
   get_storage: ^2.1.1
 #  calendar_view: ^1.1.0
   simple_speed_dial: ^0.1.7
+  qr_code_scanner: ^1.0.1
+  fluttertoast: ^8.2.1
   syncfusion_flutter_calendar: ^20.1.48
 #  flutter_phoenix: ^1.1.1
 
