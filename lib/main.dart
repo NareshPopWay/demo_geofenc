@@ -1,13 +1,32 @@
+import 'dart:io';
+
 import 'package:demo_geofenc/common/localization/demo_localization.dart';
 import 'package:demo_geofenc/common/localization/language_constant.dart';
 import 'package:demo_geofenc/ui/home_screen.dart';
 import 'package:demo_geofenc/common/phoenix.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  FirebaseOptions options;
+  if (Platform.isAndroid) {
+    options = const FirebaseOptions(
+        apiKey: "AIzaSyAW81Y8tg72GeQW-lP3lBGkb2lKpDQU6zE",
+        appId: "1:668998087416:android:1c42dfe6648a9b9d22010d",
+        messagingSenderId: "668998087416",
+        projectId: "demoapp-9c6d4");
+  } else {
+    options = const FirebaseOptions(
+        apiKey: "AIzaSyAWpZXX1XZ4MURLcnlFnpEWDQPq0r0yW_U",
+        appId: "1:851415038414:ios:161a82264c21e3c7fb939f",
+        messagingSenderId: "668998087416",
+        projectId: "demoapp-9c6d4");
+  }
+  await Firebase.initializeApp(options: options);
   await GetStorage.init();
   runApp(DemoGeofence(child: const MyApp()));
 }

@@ -20,6 +20,7 @@ class ScannerScreen extends StatefulWidget {
 class _ScannerScreenState extends State<ScannerScreen> {
   bool flashState = false;
   late QRViewController controller;
+  late Barcode result;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   bool _cameraOn = true;
   bool isLoading = false;
@@ -46,7 +47,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               child: Column(
                 children: [
                   Container(
-                    margin: EdgeInsets.fromLTRB(0, 0, 15, 10),
+                    margin: const EdgeInsets.fromLTRB(0, 0, 15, 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -58,14 +59,14 @@ class _ScannerScreenState extends State<ScannerScreen> {
                           child: Container(
                             height:screenHeight *0.10,
                             width: screenWidth *0.12,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.blueAccent,
                               shape: BoxShape.circle,
                             ),
                             margin: EdgeInsets.fromLTRB(screenWidth*0.02, 0, 0,0),
                             child: Padding(
                               padding:  EdgeInsets.only(left:screenWidth*0.02),
-                              child:  Icon(Icons.arrow_back_ios,color: Colors.white),
+                              child:  const Icon(Icons.arrow_back_ios,color: Colors.white),
                             ),
                           ),
                         ),
@@ -122,7 +123,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     },
                   ),
                 ),
-                SizedBox(height: 01),
+                const SizedBox(height: 01),
                 Text(
                   'Flash',
                   style: TextStyle(
@@ -179,10 +180,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
         print(isLoading.toString() + '==' + _cameraOn.toString());
         setState(() {
           isLoading= true;
+          result = scanData;
         });
         await controller.pauseCamera();
         Fluttertoast.showToast(
-            msg: 'QR Code is scanned',
+            msg: '${result.code}',
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
@@ -219,6 +221,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
       }
     });
   }
+
+
+
 
   @override
   void reassemble() {

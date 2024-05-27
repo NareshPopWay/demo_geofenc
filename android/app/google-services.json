@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "668998087416",
+    "project_id": "demoapp-9c6d4",
+    "storage_bucket": "demoapp-9c6d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:668998087416:android:1c42dfe6648a9b9d22010d",
+        "android_client_info": {
+          "package_name": "com.example.demo_geofenc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW81Y8tg72GeQW-lP3lBGkb2lKpDQU6zE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

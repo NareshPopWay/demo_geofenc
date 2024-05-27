@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 class HomeController extends GetxController {
   Rx<double> latitude = 0.0.obs;
   Rx<double> longitude = 0.0.obs;
-
   @override
   void onInit() async {
     // TODO: implement onInit
@@ -34,8 +33,7 @@ class HomeController extends GetxController {
       return null;
     }
     try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition();
       return position;
     } catch (e) {
       print('Error getting location: $e');

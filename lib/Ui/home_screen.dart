@@ -2,6 +2,7 @@
 
 import 'package:demo_geofenc/Controller/home_controller.dart';
 import 'package:demo_geofenc/Ui/calander/week_view.dart';
+import 'package:demo_geofenc/Ui/google_map_screen.dart';
 import 'package:demo_geofenc/Ui/qr_scanner.dart';
 import 'package:demo_geofenc/common/localization/language_constant.dart';
 import 'package:demo_geofenc/ui/change_lanuage.dart';
@@ -75,7 +76,7 @@ class HomeScreen extends GetView<HomeController> {
             label: 'Qr Scanner',
             onPressed: () {
                // Get.back();
-              Get.to(() => ScannerScreen());
+              Get.to(() => const ScannerScreen());
             },
           ),
           SpeedDialChild(
@@ -89,12 +90,12 @@ class HomeScreen extends GetView<HomeController> {
             },
           ),
           SpeedDialChild(
-            child: const Icon(Icons.calendar_view_day),
+            child: const Icon(Icons.map),
             foregroundColor: Colors.white,
             backgroundColor: Colors.blueGrey,
-            label: 'Daily Calendar ',
+            label: 'Google Map',
             onPressed: () {
-
+              Get.to(() =>  GoogleMapScreen());
             },
           ),
           //  Your other SpeedDialChildren go here.
