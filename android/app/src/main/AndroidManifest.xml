@@ -30,6 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <service android:name="com.transistorsoft.flutter.backgroundgeolocation.FLTBackgroundGeolocationService" android:permission="android.permission.BIND_JOB_SERVICE" android:foregroundServiceType="location"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

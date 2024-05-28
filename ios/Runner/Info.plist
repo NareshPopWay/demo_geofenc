@@ -45,5 +45,15 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>We use your location to track your movements.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>We use your location to track your movements.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We use your location to track your movements.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+    </array>
 </dict>
 </plist>

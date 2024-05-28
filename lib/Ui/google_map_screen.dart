@@ -17,18 +17,13 @@ class GoogleMapScreen extends GetView<MapController> {
         body: Column(
           children: [
             Expanded(
-              child: GoogleMap(
-                initialCameraPosition:  CameraPosition(
-                    target: controller.routeCoordinates.isNotEmpty
-                        ? controller.routeCoordinates.first
-                        : LatLng(0, 0),
-                    zoom: 15.2
-                ),
+              child: Obx(() => GoogleMap(
+                initialCameraPosition:  controller.initialCameraPosition,
                 mapType: MapType.hybrid,
                 markers: controller.markers,
-                // polylines: controller.polyLine,
-                polylines: Set<Polyline>.of([controller.routePolyline.value]),
                 myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                polylines: Set<Polyline>.of([controller.routePolyline.value]),
                 onMapCreated: (GoogleMapController googleMapController) async {
                   controller.location.getLocation().then((location) {
                     googleMapController.animateCamera(CameraUpdate.newLatLng(
@@ -37,7 +32,7 @@ class GoogleMapScreen extends GetView<MapController> {
                   });
                 },
 
-              ),
+              ),)
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
