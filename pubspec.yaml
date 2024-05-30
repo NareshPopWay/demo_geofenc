@@ -41,7 +41,7 @@ dependencies:
   google_maps_flutter:
 #  flutter_phoenix: ^1.1.1
   cloud_firestore:
-  firebase_core: ^2.9.0
+  firebase_core:
   firebase_analytics: 10.2.0
   permission_handler:
   http: ^0.13.4
@@ -50,8 +50,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   get:
-  geolocator: ^11.0.0
+  geolocator:
   geocoding: ^3.0.0
+  flutter_background_service: ^5.0.5
   intl:
 
 dev_dependencies:

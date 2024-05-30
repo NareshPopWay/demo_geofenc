@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:math' show atan2, cos, pi, pow, sin, sqrt;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_geofenc/Model/lat_long_model.dart';
 import 'package:demo_geofenc/common/localization/language_constant.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,6 +10,57 @@ import 'package:get/get.dart';
 class HomeController extends GetxController {
   Rx<double> latitude = 0.0.obs;
   Rx<double> longitude = 0.0.obs;
+
+  static Position? _lastPosition;
+  Timer? _timer;
+
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> getLocationAndSave() async {
+    try {
+      // Position position = await Geolocator.getCurrentPosition();
+      // await _firestore.collection('UserLocations').add({
+      //   'latitude': position.latitude,
+      //   'longitude': position.longitude,
+      //   'timestamp': FieldValue.serverTimestamp(),
+      // });
+      Geolocator.getPositionStream().listen((Position position) {
+        if (_shouldStoreLocation(position)) {
+          _firestore.collection('TrackingLocation').add({
+            'latitude': position.latitude,
+            'longitude': position.longitude,
+            'timestamp': FieldValue.serverTimestamp(),
+          });
+          _lastPosition = position;
+        }
+      });
+    } catch (e) {
+      print('Failed to get location: $e');
+    }
+  }
+
+  void _startForegroundLocationUpdates() {
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      getLocationAndSave();
+    });
+  }
+
+  static bool _shouldStoreLocation(Position newPosition) {
+    if (_lastPosition == null) {
+      return true; // No previous position, store the new one
+    }
+
+    double distance = Geolocator.distanceBetween(
+      _lastPosition!.latitude,
+      _lastPosition!.longitude,
+      newPosition.latitude,
+      newPosition.longitude,
+    );
+
+    // Store if the new position is more than 10 meters away from the last position
+    return distance > 10;
+  }
+
   @override
   void onInit() async {
     // TODO: implement onInit
@@ -15,16 +68,37 @@ class HomeController extends GetxController {
 
     permission = await Geolocator.requestPermission();
     _checkLocationPermission();
+    _startForegroundLocationUpdates();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   LocationPermission? permission;
-  Future<bool> _checkLocationPermission() async {
+  Future _checkLocationPermission() async {
+
+    // bool serviceEnabled;
+    //
+    // // Test if location services are enabled.
+    // serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    // if (!serviceEnabled) {
+    //   return Future.error('Location services are disabled.');
+    // }
+
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
     }
-    return permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse;
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+    }
   }
 
   Future<Position?> _getCurrentLocation() async {
@@ -127,4 +201,6 @@ class HomeController extends GetxController {
               ],
             ));
   }
+
+
 }

@@ -14,36 +14,69 @@ class GoogleMapScreen extends GetView<MapController> {
     return  GetBuilder<MapController>(
         builder:(controller) {
       return Scaffold(
-        body: Column(
+        body:
+        // Obx(() {
+        //   if (controller.locations.isEmpty) {
+        //     return Center(child: CircularProgressIndicator());
+        //   } else {
+        //     List<LatLng> latLngs = controller.locations.map((loc) {
+        //       return LatLng(loc['latitude'], loc['longitude']);
+        //     }).toList();
+        //     return GoogleMap(
+        //       initialCameraPosition: CameraPosition(
+        //         target: latLngs.first,
+        //         zoom: 15,
+        //       ),
+        //       mapType: MapType.hybrid,
+        //       markers: latLngs.map((latLng) => Marker(
+        //         markerId: MarkerId(latLng.toString()),
+        //         position: latLng,
+        //       )).toSet(),
+        //       polylines: {
+        //         Polyline(
+        //           polylineId: PolylineId('route'),
+        //           points: latLngs,
+        //           color: Colors.blue,
+        //           width: 5,
+        //         )
+        //       },
+        //     );
+        //   }
+        // }),
+        Stack(
           children: [
+            if (controller.routeCoordinates.isEmpty)
+             const Center(child: CircularProgressIndicator(color: Colors.blueAccent,))
+           else
             Expanded(
-              child: Obx(() => GoogleMap(
+              child:  GoogleMap(
                 initialCameraPosition:  controller.initialCameraPosition,
                 mapType: MapType.hybrid,
                 markers: controller.markers,
                 myLocationEnabled: true,
+                zoomControlsEnabled: true,
                 myLocationButtonEnabled: true,
-                polylines: Set<Polyline>.of([controller.routePolyline.value]),
+                polylines: {controller.polyline!},
                 onMapCreated: (GoogleMapController googleMapController) async {
-                  controller.location.getLocation().then((location) {
+                  controller.fetchLocations().then((location) {
                     googleMapController.animateCamera(CameraUpdate.newLatLng(
-                      LatLng(location.latitude!, location.longitude!),
+                      LatLng(location['latitude'], location['longitude']),
                     ));
                   });
                 },
 
-              ),)
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  labelText: 'Enter date (yyyy-MM-dd)',
-                  border: OutlineInputBorder(),
-                ),
-                onSubmitted: (value) => controller.showLocationsByDate(value),
               ),
             ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: TextField(
+            //     decoration: InputDecoration(
+            //       labelText: 'Enter date (yyyy-MM-dd)',
+            //       border: OutlineInputBorder(),
+            //     ),
+            //     onSubmitted: (value) => controller.showLocationsByDate(value),
+            //   ),
+            // ),
           ],
         ),
       );

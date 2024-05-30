@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:demo_geofenc/common/localization/demo_localization.dart';
 import 'package:demo_geofenc/common/localization/language_constant.dart';
+import 'package:demo_geofenc/common/location_service.dart';
 import 'package:demo_geofenc/ui/home_screen.dart';
 import 'package:demo_geofenc/common/phoenix.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,9 +11,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
   FirebaseOptions options;
   if (Platform.isAndroid) {
     options = const FirebaseOptions(
@@ -27,8 +31,30 @@ void main() async {
         projectId: "demoapp-9c6d4");
   }
   await Firebase.initializeApp(options: options);
+  await initializeService();
   await GetStorage.init();
   runApp(DemoGeofence(child: const MyApp()));
+}
+
+
+Future<void> initializeService() async {
+  final service = FlutterBackgroundService();
+  await service.configure(
+    androidConfiguration: AndroidConfiguration(
+      onStart: onStart,
+      isForegroundMode: true,
+      autoStart: true
+    ),
+    iosConfiguration: IosConfiguration(
+      onForeground: onStart,
+      autoStart: true,
+    ),
+  );
+  service.startService();
+}
+
+void onStart(ServiceInstance service) {
+  LocationService.startBackgroundLocationUpdates();
 }
 
 class MyApp extends StatefulWidget {
