@@ -11,9 +11,7 @@ class GoogleMapScreen extends GetView<MapController> {
 
   @override
   Widget build(BuildContext context) {
-    return  GetBuilder<MapController>(
-        builder:(controller) {
-      return Scaffold(
+      return Obx(() => Scaffold(
         body:
         // Obx(() {
         //   if (controller.locations.isEmpty) {
@@ -45,28 +43,34 @@ class GoogleMapScreen extends GetView<MapController> {
         // }),
         Stack(
           children: [
-            if (controller.routeCoordinates.isEmpty)
-             const Center(child: CircularProgressIndicator(color: Colors.blueAccent,))
-           else
-            Expanded(
-              child:  GoogleMap(
-                initialCameraPosition:  controller.initialCameraPosition,
+            if (controller.isLoading.value)
+              const Center(child: CircularProgressIndicator(color: Colors.blueAccent,))
+            else
+              GoogleMap(
+                initialCameraPosition: controller.initialCameraPosition,
                 mapType: MapType.hybrid,
                 markers: controller.markers,
                 myLocationEnabled: true,
                 zoomControlsEnabled: true,
                 myLocationButtonEnabled: true,
-                polylines: {controller.polyline!},
+                polylines: {
+                  Polyline(
+                  polylineId: PolylineId('route'),
+                  points: controller.polylineCoordinates,
+                  color: Colors.blue,
+                  width: 5,
+                  ),
+                },
                 onMapCreated: (GoogleMapController googleMapController) async {
-                  controller.fetchLocations().then((location) {
-                    googleMapController.animateCamera(CameraUpdate.newLatLng(
-                      LatLng(location['latitude'], location['longitude']),
-                    ));
-                  });
+                  // controller.fetchLocations().then((location) {
+                  //   googleMapController.animateCamera(CameraUpdate.newLatLng(
+                  //     LatLng(location['latitude'], location['longitude']),
+                  //   ));
+                  // });
+                  controller.mapController = googleMapController;
                 },
 
               ),
-            ),
             // Padding(
             //   padding: const EdgeInsets.all(8.0),
             //   child: TextField(
@@ -79,9 +83,6 @@ class GoogleMapScreen extends GetView<MapController> {
             // ),
           ],
         ),
-      );
-    }
-    );
-
+      ));
   }
 }

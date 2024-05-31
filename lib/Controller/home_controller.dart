@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:math' show atan2, cos, pi, pow, sin, sqrt;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_geofenc/Model/lat_long_model.dart';
@@ -6,6 +8,9 @@ import 'package:demo_geofenc/common/localization/language_constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 
 class HomeController extends GetxController {
   Rx<double> latitude = 0.0.obs;
@@ -13,7 +18,8 @@ class HomeController extends GetxController {
 
   static Position? _lastPosition;
   Timer? _timer;
-
+  StreamSubscription<LocationData>? locationSubscription;
+  Location location = Location();
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> getLocationAndSave() async {
@@ -39,10 +45,54 @@ class HomeController extends GetxController {
     }
   }
 
+   Future<void> saveLiveLocation(data) async {
+      var responseJson;
+      // if (_shouldStoreLocation(position))  {
+        log('$data');
+        final response = await http.post(
+          Uri.parse('http://116.72.8.100:2202/api/CommanAPI/SaveLocation'),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: data,
+        );
+        if(response.statusCode == 200){
+          responseJson = response.body.toString();
+          log('http://116.72.8.100:2202/api/CommanAPI/SaveLocation');
+          log('saveLiveLocation : ${responseJson}');
+        }else{
+          log('Error');
+        }
+        // _lastPosition = position;
+      // }
+  }
+
   void _startForegroundLocationUpdates() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      getLocationAndSave();
-    });
+      // getLocationAndSave();
+      locationSubscription = location.onLocationChanged.listen((LocationData currentLocation) async{
+
+        String lat = currentLocation.latitude.toString();
+        String long = currentLocation.longitude.toString();
+
+        Map data = {
+          'VendorID':'1',
+          'Latitude': lat,
+          'Longitude':long,
+          'Locationdatetime': DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now()),
+          'LocationAddress':'Bhavnagar',
+          'City':'surat',
+          'Country':'india',
+          'PostalCode':'395006',
+        };
+        saveLiveLocation(data);
+      });
+
+      Timer.periodic(const Duration(seconds: 5), (timer) {
+        if (locationSubscription != null) {
+          locationSubscription?.resume();
+        }
+      });
+
   }
 
   static bool _shouldStoreLocation(Position newPosition) {

@@ -2,7 +2,10 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:demo_geofenc/Model/location_data_model.dart';
+import 'package:demo_geofenc/common/api_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -30,20 +33,15 @@ class MapController extends GetxController{
   //
   //
   // var location = Location();
-   var routeCoordinates = <LatLng>[].obs;
-  var routePolyline = Polyline(
-    polylineId: PolylineId('route'),
-    points: [],
-    width: 5,
-    color: Colors.blue,
-  ).obs;
+  List<LatLng> polylineCoordinates = [];
+  Set<Marker> markers = {};
 
   GoogleMapController? mapController;
   var locations = <Map<String, dynamic>>[].obs;
 
-  final Set<Marker> markers = {};
+  // final Set<Marker> markers = {};
   Polyline? polyline;
-
+  RxBool isLoading = false.obs;
   // Define your static data as a List of LatLng objects
   final List<LatLng> staticLocations = [
     LatLng(21.180386455116643, 72.8330288075414),
@@ -85,7 +83,7 @@ class MapController extends GetxController{
       markers.clear();
       polyline = Polyline(
         polylineId: PolylineId('static_locations'),
-        points: routeCoordinates,
+        points: polylineCoordinates,
         color: Colors.blue,
         width: 5,
       );
@@ -101,22 +99,22 @@ class MapController extends GetxController{
       // }
 
       /// Add markers only for start and end positions
-      markers.add(Marker(
-        markerId: MarkerId('start'),
-        position: routeCoordinates.first,
-        infoWindow: InfoWindow(
-          title: 'Start Location',
-          snippet: '${routeCoordinates.first.latitude}, ${routeCoordinates.first.longitude}',
-        ),
-      ));
-      markers.add(Marker(
-        markerId: MarkerId('end'),
-        position: routeCoordinates.last,
-        infoWindow: InfoWindow(
-          title: 'End Location',
-          snippet: '${routeCoordinates.last.latitude}, ${routeCoordinates.last.longitude}',
-        ),
-      ));
+      // markers.add(Marker(
+      //   markerId: MarkerId('start'),
+      //   position: polylineCoordinates.first,
+      //   infoWindow: InfoWindow(
+      //     title: 'Start Location',
+      //     snippet: '${polylineCoordinates.first.latitude}, ${polylineCoordinates.first.longitude}',
+      //   ),
+      // ));
+      // markers.add(Marker(
+      //   markerId: MarkerId('end'),
+      //   position: polylineCoordinates.last,
+      //   infoWindow: InfoWindow(
+      //     title: 'End Location',
+      //     snippet: '${polylineCoordinates.last.latitude}, ${polylineCoordinates.last.longitude}',
+      //   ),
+      // ));
     update();
   }
 
@@ -195,16 +193,15 @@ class MapController extends GetxController{
     //   }
     // });
     // _startForegroundLocationUpdates();
-    fetchLocations().then((value) {
-      getAndShowStaticLocations();
-    }
-    );
+    getLocationList();
+    //     .then((value) {
+    //   getAndShowStaticLocations();
+    // }
+    // );
   }
 
-
-
   Future fetchLocations() async{
-
+    isLoading.value = true ;
     DateTime now = DateTime.now();
     DateTime startOfDay = DateTime(now.year, now.month, now.day, 0, 0, 0);
     DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
@@ -234,12 +231,61 @@ class MapController extends GetxController{
       return LatLng(doc['latitude'], doc['longitude']);
     }).toList();
 
-    routeCoordinates.assignAll(coordinates);
+    // if(coordinates.isNotEmpty){
+    polylineCoordinates.assignAll(coordinates);
+      isLoading.value = false;
+    // }else{
+    //   Geolocator.getPositionStream().listen((Position position) async{
+    //     List<LatLng> coordinates = querySnapshot.docs.map((doc) {
+    //       return LatLng(position.latitude,position.longitude);
+    //     }).toList();
+    //     routeCoordinates.assignAll(coordinates);
+    //     isLoading.value = false;
+    //     });
+    //   isLoading.value = false;
+    // }
 
+    isLoading.value = false;
     // _firestore.collection('UserLocations').snapshots().listen((snapshot) {
     //
     //   locations.value = snapshot.docs.map((doc) => doc.data()).toList();
     // });
+  }
+
+
+  Future<void> getLocationList() async {
+    isLoading.value = true;
+
+    try {
+      List<LocationDataModel> locations = await APiProvider().fetchLIVELocationData();
+
+      List<LatLng> coordinates = locations
+          .where((location) => location.latitude != null && location.longitude != null)
+          .map((location) => LatLng(double.parse(location.latitude!), double.parse(location.longitude!)))
+          .toList();
+
+      Set<Marker> marker = locations
+          .where((location) => location.latitude != null && location.longitude != null)
+          .map((location) => Marker(
+        markerId: MarkerId(location.vendorLocationId.toString()),
+        position: LatLng(double.parse(location.latitude!), double.parse(location.longitude!)),
+        infoWindow: InfoWindow(
+          title: location.locationAddress,
+          snippet: '${location.city}, ${location.country}',
+        ),
+      )).toSet();
+
+      polylineCoordinates = coordinates;
+      markers = marker;
+      update();
+      isLoading.value = false;
+
+    } catch (e) {
+      print('Error loading location data: $e');
+    }
+
+    isLoading.value = false;
+    return;
   }
 
   // void updateRoutePolyline() {

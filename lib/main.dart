@@ -1,6 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:demo_geofenc/common/localization/demo_localization.dart';
 import 'package:demo_geofenc/common/localization/language_constant.dart';
 import 'package:demo_geofenc/common/location_service.dart';
@@ -12,6 +14,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
