@@ -109,7 +109,7 @@ class HomeScreen extends GetView<HomeController> {
                 child: !controller.isInPremiseCheck.value
                     ? TextButton(
                         onPressed: () {
-                          controller.checkPremisesEntry(context);
+                          // controller.checkPremisesEntry(context);
                         },
                         child: Container(
                             decoration: BoxDecoration(

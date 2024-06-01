@@ -45,14 +45,13 @@ class LocationService {
   }
 
   static void startBackgroundLocationUpdates() async {
-
     locationSubscription = location.onLocationChanged.listen((LocationData currentLocation) async{
       Map data = {
         'VendorID': '1',
         'Latitude':  currentLocation.latitude,
         'Longitude': currentLocation.longitude,
         'Locationdatetime': DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now()),
-        'LocationAddress': 'Ahmedabad',
+        'LocationAddress': 'Background Service from Phone',
         'City': 'Surat',
         'Country': 'India',
         'PostalCode': '395005',

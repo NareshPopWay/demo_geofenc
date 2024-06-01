@@ -53,6 +53,7 @@ dependencies:
   geolocator:
   geocoding: ^3.0.0
   flutter_background_service: ^5.0.5
+  workmanager: ^0.5.2
   intl:
 
 dev_dependencies:
@@ -83,6 +84,7 @@ flutter:
     - lib/common/languages/gu.json
     - lib/common/languages/hi.json
     - lib/common/languages/mr.json
+    - assets/
 
   #   - images/a_dot_ham.jpeg
 

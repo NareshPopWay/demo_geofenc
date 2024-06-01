@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_geofenc/Model/location_data_model.dart';
 import 'package:demo_geofenc/common/api_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
@@ -160,7 +160,7 @@ class MapController extends GetxController{
   //  ).obs;
 
   @override
-  void onInit() {
+  void onInit() async{
     // TODO: implement onInit
     super.onInit();
     // location.onLocationChanged.listen((LocationData currentLocation) async {
@@ -193,6 +193,15 @@ class MapController extends GetxController{
     //   }
     // });
     // _startForegroundLocationUpdates();
+
+    _startEndIcon = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(size: Size(24, 24)),
+      'assets/location.png',
+    );
+    _intermediateIcon = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(),
+      'assets/intermediate_marker.png',
+    );
     getLocationList();
     //     .then((value) {
     //   getAndShowStaticLocations();
@@ -252,7 +261,8 @@ class MapController extends GetxController{
     // });
   }
 
-
+  BitmapDescriptor? _startEndIcon;
+  BitmapDescriptor? _intermediateIcon;
   Future<void> getLocationList() async {
     isLoading.value = true;
 
@@ -264,10 +274,14 @@ class MapController extends GetxController{
           .map((location) => LatLng(double.parse(location.latitude!), double.parse(location.longitude!)))
           .toList();
 
+
+
+
       Set<Marker> marker = locations
           .where((location) => location.latitude != null && location.longitude != null)
           .map((location) => Marker(
         markerId: MarkerId(location.vendorLocationId.toString()),
+        icon: _intermediateIcon!,
         position: LatLng(double.parse(location.latitude!), double.parse(location.longitude!)),
         infoWindow: InfoWindow(
           title: location.locationAddress,
@@ -275,8 +289,27 @@ class MapController extends GetxController{
         ),
       )).toSet();
 
+
       polylineCoordinates = coordinates;
       markers = marker;
+      markers.add(Marker(
+        markerId: MarkerId('start'),
+        position: polylineCoordinates.first,
+        icon: _startEndIcon!,
+        infoWindow: InfoWindow(
+          title: 'Start Location',
+          snippet: '${polylineCoordinates.first.latitude}, ${polylineCoordinates.first.longitude}',
+        ),
+      ));
+      markers.add(Marker(
+        markerId: MarkerId('end'),
+        position: polylineCoordinates.last,
+        icon: _startEndIcon!,
+        infoWindow: InfoWindow(
+          title: 'End Location',
+          snippet: '${polylineCoordinates.last.latitude}, ${polylineCoordinates.last.longitude}',
+        ),
+      ));
       update();
       isLoading.value = false;
 

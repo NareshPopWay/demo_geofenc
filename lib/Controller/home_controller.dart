@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:workmanager/workmanager.dart';
 
 class HomeController extends GetxController {
   Rx<double> latitude = 0.0.obs;
@@ -118,7 +119,14 @@ class HomeController extends GetxController {
 
     permission = await Geolocator.requestPermission();
     _checkLocationPermission();
+    Workmanager().registerOneOffTask(
+      "1",
+      "fetchLocation",
+      constraints: Constraints(networkType: NetworkType.connected),
+      initialDelay: const Duration(seconds: 5),
+    );
     _startForegroundLocationUpdates();
+
   }
 
   @override
