@@ -1,50 +1,48 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
+import 'dart:isolate';
 import 'dart:math' show atan2, cos, pi, pow, sin, sqrt;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_geofenc/Model/lat_long_model.dart';
-import 'package:demo_geofenc/common/localization/language_constant.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
-import 'package:workmanager/workmanager.dart';
+import 'package:flutter/services.dart';
+
 
 class HomeController extends GetxController {
   Rx<double> latitude = 0.0.obs;
   Rx<double> longitude = 0.0.obs;
 
-  static Position? _lastPosition;
+  // static Position? _lastPosition;
   Timer? _timer;
   StreamSubscription<LocationData>? locationSubscription;
   Location location = Location();
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> getLocationAndSave() async {
-    try {
-      // Position position = await Geolocator.getCurrentPosition();
-      // await _firestore.collection('UserLocations').add({
-      //   'latitude': position.latitude,
-      //   'longitude': position.longitude,
-      //   'timestamp': FieldValue.serverTimestamp(),
-      // });
-      Geolocator.getPositionStream().listen((Position position) {
-        if (_shouldStoreLocation(position)) {
-          _firestore.collection('TrackingLocation').add({
-            'latitude': position.latitude,
-            'longitude': position.longitude,
-            'timestamp': FieldValue.serverTimestamp(),
-          });
-          _lastPosition = position;
-        }
-      });
-    } catch (e) {
-      print('Failed to get location: $e');
-    }
-  }
+  // Future<void> getLocationAndSave() async {
+  //   try {
+  //     // Position position = await Geolocator.getCurrentPosition();
+  //     // await _firestore.collection('UserLocations').add({
+  //     //   'latitude': position.latitude,
+  //     //   'longitude': position.longitude,
+  //     //   'timestamp': FieldValue.serverTimestamp(),
+  //     // });
+  //     Geolocator.getPositionStream().listen((Position position) {
+  //       if (_shouldStoreLocation(position)) {
+  //         _firestore.collection('TrackingLocation').add({
+  //           'latitude': position.latitude,
+  //           'longitude': position.longitude,
+  //           'timestamp': FieldValue.serverTimestamp(),
+  //         });
+  //         _lastPosition = position;
+  //       }
+  //     });
+  //   } catch (e) {
+  //     print('Failed to get location: $e');
+  //   }
+  // }
 
    Future<void> saveLiveLocation(data) async {
       var responseJson;
@@ -96,82 +94,83 @@ class HomeController extends GetxController {
 
   }
 
-  static bool _shouldStoreLocation(Position newPosition) {
-    if (_lastPosition == null) {
-      return true; // No previous position, store the new one
-    }
-
-    double distance = Geolocator.distanceBetween(
-      _lastPosition!.latitude,
-      _lastPosition!.longitude,
-      newPosition.latitude,
-      newPosition.longitude,
-    );
-
-    // Store if the new position is more than 10 meters away from the last position
-    return distance > 10;
-  }
-
+  // static bool _shouldStoreLocation(Position newPosition) {
+  //   if (_lastPosition == null) {
+  //     return true; // No previous position, store the new one
+  //   }
+  //
+  //   double distance = Geolocator.distanceBetween(
+  //     _lastPosition!.latitude,
+  //     _lastPosition!.longitude,
+  //     newPosition.latitude,
+  //     newPosition.longitude,
+  //   );
+  //
+  //   // Store if the new position is more than 10 meters away from the last position
+  //   return distance > 10;
+  // }
+  ReceivePort port = ReceivePort();
   @override
   void onInit() async {
     // TODO: implement onInit
     super.onInit();
-
-    permission = await Geolocator.requestPermission();
-    _checkLocationPermission();
-    Workmanager().registerOneOffTask(
-      "1",
-      "fetchLocation",
-      constraints: Constraints(networkType: NetworkType.connected),
-      initialDelay: const Duration(seconds: 5),
-    );
+    // permission = await Geolocator.requestPermission();
+    // _checkLocationPermission();
     _startForegroundLocationUpdates();
+    startLocationService();
 
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
+  static const platform = MethodChannel('com.example.demo_geofenc/location');
 
-  LocationPermission? permission;
-  Future _checkLocationPermission() async {
-
-    // bool serviceEnabled;
-    //
-    // // Test if location services are enabled.
-    // serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    // if (!serviceEnabled) {
-    //   return Future.error('Location services are disabled.');
-    // }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
-    }
-  }
-
-  Future<Position?> _getCurrentLocation() async {
-    bool hasPermission = await _checkLocationPermission();
-    if (!hasPermission) {
-      return null;
-    }
+  Future<void> startLocationService() async {
     try {
-      Position position = await Geolocator.getCurrentPosition();
-      return position;
-    } catch (e) {
-      print('Error getting location: $e');
-      return null;
+      await platform.invokeMethod('startLocationService');
+    } on PlatformException catch (e) {
+      print("Failed to start location service: '${e.message}'.");
     }
   }
+
+
+
+
+  // // LocationPermission? permission;
+  // Future _checkLocationPermission() async {
+  //
+  //   // bool serviceEnabled;
+  //   //
+  //   // // Test if location services are enabled.
+  //   // serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   // if (!serviceEnabled) {
+  //   //   return Future.error('Location services are disabled.');
+  //   // }
+  //
+  //   LocationPermission permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       return Future.error('Location permissions are denied');
+  //     }
+  //   }
+  //
+  //   if (permission == LocationPermission.deniedForever) {
+  //     return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+  //   }
+  // }
+  //
+  // Future<Position?> _getCurrentLocation() async {
+  //   bool hasPermission = await _checkLocationPermission();
+  //   if (!hasPermission) {
+  //     return null;
+  //   }
+  //   try {
+  //     Position position = await Geolocator.getCurrentPosition();
+  //     return position;
+  //   } catch (e) {
+  //     print('Error getting location: $e');
+  //     return null;
+  //   }
+  // }
 
   List<Premises> premisesList = [
     Premises('આપડી ઓફિસ', 21.180374200910343, 72.83303760939276,
@@ -209,56 +208,7 @@ class HomeController extends GetxController {
   bool isInPremise = false;
   RxBool isInPremiseCheck = false.obs;
 
-  Future<void> checkPremisesEntry(context) async {
-    isInPremiseCheck.value = true;
-    Position? position = await _getCurrentLocation();
-    if (position == null) {
-      return;
-    }
 
-    for (Premises premises in premisesList) {
-      double distance = _calculateDistance(position.latitude,
-          position.longitude, premises.latitude, premises.longitude);
-      if (distance <= premises.radius) {
-        // User is within the premises
-        isInPremiseCheck.value = false;
-        showCupertinoDialog(
-          context: context,
-          builder: (context) => CupertinoAlertDialog(
-            title: Text(getTranslated(context, 'title1_text')!),
-            content: Text(getTranslated(context, 'content1_text')!),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                child: Text(getTranslated(context, 'dialogBtn_text')!),
-                onPressed: () {
-                  Get.back();
-                },
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-    }
-    isInPremiseCheck.value = false;
-    // User is not within any premises (optional: update UI)
-    showCupertinoDialog(
-        context: context,
-        builder: (context) => CupertinoAlertDialog(
-              title: Text(getTranslated(context, 'title2_text')!),
-              content: Text(getTranslated(context, 'content2_text')!),
-              actions: <Widget>[
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: Text(getTranslated(context, 'dialogBtn_text')!),
-                  onPressed: () {
-                    Get.back();
-                  },
-                ),
-              ],
-            ));
-  }
 
 
 }

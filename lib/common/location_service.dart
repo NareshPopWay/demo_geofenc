@@ -45,28 +45,32 @@ class LocationService {
   }
 
   static void startBackgroundLocationUpdates() async {
-    locationSubscription = location.onLocationChanged.listen((LocationData currentLocation) async{
-      Map data = {
-        'VendorID': '1',
-        'Latitude':  currentLocation.latitude,
-        'Longitude': currentLocation.longitude,
-        'Locationdatetime': DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now()),
-        'LocationAddress': 'Background Service from Phone',
-        'City': 'Surat',
-        'Country': 'India',
-        'PostalCode': '395005',
-      };
-      log('LIVELocation :- ${currentLocation.latitude.toString()},${currentLocation.longitude.toString()}  ');
-      saveLiveLocation(data);
-    });
 
-    Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (locationSubscription != null) {
-        log('saveLIVELocation :- ${timer.tick} ');
-        locationSubscription?.resume();
-      }
-    });
+      locationSubscription = location.onLocationChanged.listen((LocationData currentLocation) async{
+        Map data = {
+          'VendorID': '1',
+          'Latitude':  currentLocation.latitude,
+          'Longitude': currentLocation.longitude,
+          'Locationdatetime': DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now()),
+          'LocationAddress': 'Background Service from Phone when app was kill',
+          'City': 'Surat',
+          'Country': 'India',
+          'PostalCode': '395005',
+        };
+        log('LIVELocation :- ${currentLocation.latitude.toString()},${currentLocation.longitude.toString()}  ');
+        saveLiveLocation(data);
+      });
 
+
+      Timer.periodic(const Duration(seconds: 5), (timer)async {
+        if (locationSubscription != null) {
+          log('saveLIVELocation :- ${timer.tick} ');
+          // await   location.getLocation().then((value) =>
+          //     log('LIVELocation :- ${value.latitude.toString()},${value.longitude.toString()} ')
+          // );
+          locationSubscription?.resume();
+        }
+      });
   }
 
   // static Future<void> startTracking() async {

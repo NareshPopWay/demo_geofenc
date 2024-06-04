@@ -53,7 +53,6 @@ dependencies:
   geolocator:
   geocoding: ^3.0.0
   flutter_background_service: ^5.0.5
-  workmanager: ^0.5.2
   intl:
 
 dev_dependencies:

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_geofenc/common/localization/demo_localization.dart';
 import 'package:demo_geofenc/common/localization/language_constant.dart';
 import 'package:demo_geofenc/common/location_service.dart';
@@ -10,20 +11,16 @@ import 'package:demo_geofenc/ui/home_screen.dart';
 import 'package:demo_geofenc/common/phoenix.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
-import 'package:intl/intl.dart';
 import 'package:location/location.dart';
-import 'package:workmanager/workmanager.dart';
-import 'package:http/http.dart' as http;
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+
   FirebaseOptions options;
   if (Platform.isAndroid) {
     options = const FirebaseOptions(
@@ -41,76 +38,7 @@ void main() async {
   await Firebase.initializeApp(options: options);
   await initializeService();
   await GetStorage.init();
-  Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
   runApp(DemoGeofence(child: const MyApp()));
-}
-
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.value(false);
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.value(false);
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return Future.value(false);
-    }
-      // Timer.periodic(const Duration(seconds: 5), (timer) async{
-        Position position = await Geolocator.getCurrentPosition();
-        print("Background Location: ${position.latitude}, ${position.longitude}");
-
-        Map data = {
-          'VendorID': '1',
-          'Latitude':  position.latitude.toString(),
-          'Longitude': position.longitude.toString(),
-          'Locationdatetime': DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now()),
-          'LocationAddress': 'Background Service from Phone Work Manager',
-          'City': 'Surat',
-          'Country': 'India',
-          'PostalCode': '395005',
-        };
-        log('LIVELocation :- ${position.latitude.toString()},${position.longitude.toString()}  ');
-
-        // saveLiveLocation(data);
-      // });
-      // You can send the location data to your server or handle it as needed
-      return Future.value(true);
-
-  });
-}
-
-Future<void> saveLiveLocation(data) async {
-  var responseJson;
-  // if (_shouldStoreLocation(position))  {
-  log('$data');
-  final response = await http.post(
-    Uri.parse('http://116.72.8.100:2202/api/CommanAPI/SaveLocation'),
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      'Accept': 'application/json',
-    },
-    body: data,
-  );
-  if(response.statusCode == 200){
-    responseJson = response.body.toString();
-    log('saveLiveLocation : ${responseJson}');
-  }else{
-    log('Error');
-  }
-  // _lastPosition = position;
-  // }
 }
 
 Future<void> initializeService() async {
@@ -134,7 +62,6 @@ Future<void> initializeService() async {
 void onStart(ServiceInstance service) {
    LocationService.startBackgroundLocationUpdates();
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
